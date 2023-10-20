@@ -13,6 +13,7 @@
     "lucide-react": "^0.288.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-webcam": "^7.1.1",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {

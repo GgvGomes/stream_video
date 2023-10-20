@@ -1,23 +1,41 @@
 import { Download, CircleDot, Trash, StopCircleIcon } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import Webcam from "react-webcam";
 
 function App() {
   const [isRec, setIsRec] = useState(false);
+  const webcamRef = useRef(null);
+
+  const videoConstraints = {
+    width: { min: 480 },
+    height: { min: 720 },
+    aspectRatio: 0.6666666667,
+    facingMode: "user",
+  };
 
   return (
     <div className="w-full h-full flex flex-wrap justify-center align-top pt-20">
       <h1 className="text-7xl font-bold text-primary">Vídeo Stream Conversor</h1>
 
       <div className="w-full h-[82%] flex flex-wrap content-start justify-center">
-        {/* <div className="h-auto w-[68%] flex"> */}
-        {/* <button
-            className="ml-auto text-red-500/60 border-red-500/60 px-6 h-10 text-lg inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border-2 shadow 
-          hover:bg-red-500/80 hover:text-zinc-300">
-            <CircleDot size={20} className="mr-2" /> Rec
-          </button> */}
-        {/* </div> */}
+        {/* <div className="h-auto w-[68%] flex"> 
+          <button
+              className="ml-auto text-red-500/60 border-red-500/60 px-6 h-10 text-lg inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border-2 shadow 
+            hover:bg-red-500/80 hover:text-zinc-300">
+              <CircleDot size={20} className="mr-2" /> Rec
+          </button> 
+        </div> */}
 
-        <div className="h-[80%] w-[68%] border-2 border-muted-foreground rounded-md mb-6 mt-2"></div>
+        <div className="h-[80%] w-[68%] border-2 border-muted-foreground rounded-md mb-6 mt-2">
+          <Webcam
+            width={1080}
+            audio={true}
+            // imageSmoothing={true}
+            screenshotFormat="image/jpeg"
+            ref={webcamRef}
+            videoConstraints={videoConstraints}
+          />
+        </div>
 
         <div className="flex w-[67%] justify-end gap-x-6">
           <button
