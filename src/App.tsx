@@ -1,9 +1,11 @@
+import axios from "axios";
 import {
   LucideArrowDownRightSquare,
   Download,
   CircleDot,
   Trash,
   StopCircleIcon,
+  Upload,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
@@ -13,7 +15,7 @@ function App() {
     width: { min: 1800 },
     height: { min: 720 },
     aspectRatio: 0.6666666667,
-    facingMode: "user"
+    facingMode: "user",
   };
 
   const [permission, setPermission] = useState(false);
@@ -25,6 +27,7 @@ function App() {
 
   const [videoChunks, setVideoChunks] = useState<Blob[]>([]);
   const [recordedVideo, setRecordedVideo] = useState<string | null>(null);
+  const [video64, setVideo64] = useState<string | null>(null);
 
   const getMicrophoneAndAudioPermission = async () => {
     if ("MediaRecorder" in window) {
@@ -78,20 +81,52 @@ function App() {
     setVideoChunks(localVideoChunks);
   };
 
+  function blobToBase64(blob: Blob) {
+    return new Promise((resolve, _) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }
+
   const stopRecording = () => {
-    console.log("stop");
     setRecordingStatus("inactive");
 
     if (mediaRecorder.current === null) return;
 
     //stops the recording instance
     mediaRecorder.current.stop();
-    mediaRecorder.current.onstop = () => {
-        const videoBlob = new Blob(videoChunks, { type: mimeType });
-        const videoUrl = URL.createObjectURL(videoBlob);
-        setRecordedVideo(videoUrl);
-        setVideoChunks([]);
+    mediaRecorder.current.onstop = async () => {
+      const base64 = await blobToBase64(videoChunks[0]);
+      setVideo64(base64 as string);
+
+      const videoBlob = new Blob(videoChunks, { type: mimeType });
+      const videoUrl = URL.createObjectURL(videoBlob);
+      setRecordedVideo(videoUrl);
+      setVideoChunks([]);
     };
+  };
+
+  const api = axios.create({
+    headers: {
+      "content-type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+      Accept: "*/*",
+    },
+  });
+
+  // Dar um jeito de conseguir o binário ou passar um blob por completo msm
+  // Mudar a logica para armazenar apenas um blob no state e não um array, acho q isso n é mt certo sla
+  // Testar com um video grande mais pra frente
+  const postVideo = () => {
+    api
+      .post(import.meta.env.VITE_DB_URL_LOCAL + "Video/UploadVideo", {
+        file: video64,
+      })
+      .then((response) => {
+        console.log(response);
+      });
   };
 
   return (
@@ -150,11 +185,17 @@ function App() {
               recordingStatus === "inactive" ? "cursor-not-allowed" : "cursor-pointer"
             }`}>
             <button
-              disabled={videoChunks === null && recordingStatus === "inactive"}
+              disabled={recordedVideo === null && recordingStatus === "inactive"}
               className="px-6 h-12 text-lg inline-flex items-center justify-center rounded-md  font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90">
               <Download size={20} className="mr-2" /> Baixar
             </button>
           </a>
+          <button
+            onClick={postVideo}
+            disabled={recordedVideo === null && recordingStatus === "inactive"}
+            className="px-6 h-12 text-lg inline-flex items-center justify-center rounded-md  font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90">
+            <Upload size={20} className="mr-2" /> Salvar
+          </button>
         </div>
       </div>
     </div>
