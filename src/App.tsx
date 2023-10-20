@@ -13,7 +13,7 @@ function App() {
     width: { min: 1800 },
     height: { min: 720 },
     aspectRatio: 0.6666666667,
-    facingMode: "user",
+    facingMode: "user"
   };
 
   const [permission, setPermission] = useState(false);
@@ -25,9 +25,6 @@ function App() {
 
   const [videoChunks, setVideoChunks] = useState<Blob[]>([]);
   const [recordedVideo, setRecordedVideo] = useState<string | null>(null);
-
-  // const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
-  // const [audio, setAudio] = useState<string | null>(null);
 
   const getMicrophoneAndAudioPermission = async () => {
     if ("MediaRecorder" in window) {
@@ -106,9 +103,9 @@ function App() {
           <Webcam
             width={1080}
             className="w-full h-full"
-            audio={true}
-            imageSmoothing={true}
-            screenshotFormat="image/jpeg"
+            audio={false}
+            // audio={true}
+            screenshotFormat={"image/jpeg"}
             videoConstraints={videoConstraints}
           />
         </div>
