@@ -1,4 +1,4 @@
-import { Download, CircleDot, Trash } from "lucide-react";
+import { Download, CircleDot, Trash, StopCircleIcon } from "lucide-react";
 import { useState } from "react";
 
 function App() {
@@ -32,8 +32,17 @@ function App() {
 
           <button
             className="ml-auto text-red-500/60 border-red-500/60 px-6 h-12 text-lg inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border-2 shadow 
-          hover:bg-red-500/80 hover:text-zinc-300">
-            <CircleDot size={20} className="mr-2" /> Rec
+          hover:bg-red-500/80 hover:text-zinc-300"
+            onClick={() => setIsRec((old) => !old)}>
+            {isRec ? (
+              <>
+                <StopCircleIcon size={20} className="mr-2" /> Stop
+              </>
+            ) : (
+              <>
+                <CircleDot size={20} className="mr-2" /> Rec
+              </>
+            )}
           </button>
           <button
             disabled={true}
