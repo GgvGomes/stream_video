@@ -6,22 +6,26 @@ import {
   Trash,
   StopCircleIcon,
   Upload,
+  Rocket,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
 function App() {
-  const videoConstraints = {
+  const videoConstraints: MediaTrackConstraints = {
     width: { min: 1800 },
     height: { min: 720 },
     aspectRatio: 0.6666666667,
     facingMode: "user",
+    noiseSuppression: true,
+    frameRate: { ideal: 60, max: 60 },
+    autoGainControl: true,
   };
 
   const [permission, setPermission] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const mimeType = "video/webm";
+  const mimeType = "video/webm;codecs=vp9,opus";
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const [recordingStatus, setRecordingStatus] = useState("inactive");
 
@@ -32,14 +36,11 @@ function App() {
   const getMicrophoneAndAudioPermission = async () => {
     if ("MediaRecorder" in window) {
       try {
-        const videoConstraints = {
+        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const videoStream = await navigator.mediaDevices.getUserMedia({
           audio: false,
           video: true,
-        };
-        const audioConstraints = { audio: true };
-
-        const audioStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
-        const videoStream = await navigator.mediaDevices.getUserMedia(videoConstraints);
+        });
 
         setPermission(true);
         //combine both audio and video streams
@@ -68,7 +69,8 @@ function App() {
     //create new Media recorder instance using the stream
     if (stream === null) return;
 
-    const media = new MediaRecorder(stream, { mimeType });
+    const media = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 180000 });
+    // mediaRecorder.current?.stream.
     mediaRecorder.current = media;
     mediaRecorder.current.start();
 
@@ -97,11 +99,12 @@ function App() {
     //stops the recording instance
     mediaRecorder.current.stop();
     mediaRecorder.current.onstop = async () => {
-      const base64 = await blobToBase64(videoChunks[0]);
-      setVideo64(base64 as string);
-
       const videoBlob = new Blob(videoChunks, { type: mimeType });
       const videoUrl = URL.createObjectURL(videoBlob);
+
+      const base64 = await blobToBase64(videoBlob);
+      setVideo64(base64 as string);
+
       setRecordedVideo(videoUrl);
       setVideoChunks([]);
     };
@@ -116,9 +119,6 @@ function App() {
     },
   });
 
-  // Dar um jeito de conseguir o binário ou passar um blob por completo msm
-  // Mudar a logica para armazenar apenas um blob no state e não um array, acho q isso n é mt certo sla
-  // Testar com um video grande mais pra frente
   const postVideo = () => {
     api
       .post(import.meta.env.VITE_DB_URL_LOCAL + "Video/UploadVideo", {
@@ -128,6 +128,10 @@ function App() {
         console.log(response);
       });
   };
+
+  const sendToRocketChat = () => {
+
+  }
 
   return (
     <div className="w-full h-full flex flex-wrap justify-center align-top pt-20">
@@ -140,6 +144,7 @@ function App() {
             className="w-full h-full"
             audio={false}
             // audio={true}
+            download={true}
             screenshotFormat={"image/jpeg"}
             videoConstraints={videoConstraints}
           />
@@ -179,6 +184,7 @@ function App() {
           </button>
 
           <a
+            download
             target="_blank"
             href={recordedVideo || ``}
             className={`${
@@ -195,6 +201,12 @@ function App() {
             disabled={recordedVideo === null && recordingStatus === "inactive"}
             className="px-6 h-12 text-lg inline-flex items-center justify-center rounded-md  font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90">
             <Upload size={20} className="mr-2" /> Salvar
+          </button>
+          <button
+            onClick={sendToRocketChat}
+            disabled={recordedVideo === null && recordingStatus === "inactive"}
+            className="px-6 h-12 text-lg inline-flex items-center justify-center rounded-md  font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-green-500 text-primary-foreground shadow hover:bg-primary/90">
+            <Rocket size={20} className="mr-2" /> Enviar 
           </button>
         </div>
       </div>
