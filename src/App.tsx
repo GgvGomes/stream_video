@@ -5,6 +5,7 @@ import { Suspense, lazy } from "react";
 
 const RecVideos = lazy(() => import("./pages/recVideos"));
 const ViewVideos = lazy(() => import("./pages/viewVideos"));
+const ViewUnicVideo = lazy(() => import("./pages/viewUnicVideo"));
 
 function Loading() {
   return (
@@ -18,6 +19,7 @@ function App() {
   return (
     <Router>
       <Routes>
+
         <Route
           path="/"
           element={
@@ -34,6 +36,15 @@ function App() {
             </Suspense>
           }
         />
+        <Route
+          path="/unic/video"
+          element={
+            <Suspense fallback={Loading()}>
+              <ViewUnicVideo />
+            </Suspense>
+          }
+        />
+
       </Routes>
     </Router>
   );

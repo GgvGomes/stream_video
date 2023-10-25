@@ -1,7 +1,7 @@
 import moment from "moment";
 import { Video } from "../types/videos";
 
-export function CardVideo({ date, id, video }: Video) {
+export function CardVideo({ data_criado: date, id, video }: Video) {
   return (
     <div className="p-4 h-72 w-[22%] cursor-pointer group">
       <a

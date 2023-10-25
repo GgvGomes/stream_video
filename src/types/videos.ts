@@ -1,5 +1,8 @@
-export interface Video {
+export interface VideoInfos {
   id: string;
-  date: string;
-  video: string;
+  data_criado: string;
 }
+
+export type Video = {
+  video: string;
+} & VideoInfos;

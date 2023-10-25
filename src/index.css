@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-video {
-  transform: scaleX(-1);
-}
-
 @layer base {
   :root {
     --background: 222.2 84% 4.9%;
