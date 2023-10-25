@@ -7,7 +7,7 @@ import { videoConstraints } from "../functions/fileFunctions";
 import { api } from "../utils/axios";
 import { RecButton } from "../components/buttons/rec";
 
-export function RecVideos() {
+export default function RecVideos() {
   const [stream, setStream] = useState<MediaStream | null>(null);
 
   const { RecButtonComponent, recordingStatus, urlVideo, video64 } = RecButton({

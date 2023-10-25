@@ -3,7 +3,7 @@ import { CardVideo } from "../components/cardVideo";
 import { Video } from "../types/videos";
 import { api } from "../utils/axios";
 
-export function ViewVideos() {
+export default function ViewVideos() {
   const [videos, setVideos] = useState<Video[]>([]);
 
   useEffect(() => {
@@ -21,7 +21,6 @@ export function ViewVideos() {
           {/* Card videos */}
           {videos.map((video) => (
             <>
-              <CardVideo key={video.id} {...video} />
               <CardVideo key={video.id} {...video} />
             </>
           ))}
